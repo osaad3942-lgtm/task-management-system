@@ -303,7 +303,7 @@ name=John Doe&email=john@example.com&password=secret&role=employee
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/your-org/task-management-system.git
+git clone https://github.com/osaad3942-lgtm/task-management-system/tree/main
 cd task-management-system
 ```
 
