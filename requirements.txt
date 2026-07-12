@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+sqlalchemy
+pyodbc
+python-jose
+passlib[bcrypt]
+python-multipart
+jinja2
+redis
+pytest
+httpx

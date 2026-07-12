@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            height: 90vh;
+            max-height: 800px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            padding: 30px 20px;
+            border-radius: 10px 0 0 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .nav-btn {
+            background: #34495e;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.3s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: #667eea;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            margin-top: auto;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .main-content.active {
+            display: block;
+        }
+
+        .auth-panel {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 100;
+        }
+
+        .auth-panel.active {
+            display: block;
+        }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        .auth-box {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-box h2 {
+            margin-bottom: 30px;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #764ba2;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+
+        .btn-edit {
+            background: #3498db;
+            padding: 8px 12px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .btn-edit:hover {
+            background: #2980b9;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .form-inline {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .form-inline input,
+        .form-inline select {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .form-inline button {
+            padding: 10px 20px;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            transition: box-shadow 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+        }
+
+        .auth-toggle button {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .user-info {
+            background: #ecf0f1;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: box-shadow 0.3s;
+        }
+
+        .task-card:hover {
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .task-card.completed {
+            border-left-color: #27ae60;
+            opacity: 0.8;
+        }
+
+        .task-info h3 {
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .task-info p {
+            color: #7f8c8d;
+            font-size: 13px;
+        }
+
+        .task-info small {
+            display: block;
+            margin: 4px 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .status-to-do {
+            background: #e3f2fd;
+            color: #0277bd;
+        }
+
+        .status-in-progress {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-done {
+            background: #d1f0dc;
+            color: #155724;
+        }
+
+        .status-low {
+            background: #e3f2fd;
+            color: #0277bd;
+        }
+
+        .status-medium {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-high {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-radius: 10px 10px 0 0;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .task-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- AUTH PANEL -->
+    <div id="authPanel" class="auth-panel active">
+        <div class="auth-container">
+            <div class="auth-box">
+                <h2 id="authTitle">Login</h2>
+                <div id="authAlert"></div>
+
+                <!-- Login Form -->
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password">
+                    </div>
+                    <button class="btn btn-full" onclick="handleLogin()">Login</button>
+                    <div class="auth-toggle">
+                        Don't have an account? <button onclick="toggleAuthForm()">Register</button>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div id="registerForm" style="display: none;">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="registerName" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" placeholder="Enter your password">
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="registerRole">
+                            <option value="employee">employee</option>
+                            <option value="manager">Manager</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-full" onclick="handleRegister()">Register</button>
+                    <div class="auth-toggle">
+                        Already have an account? <button onclick="toggleAuthForm()">Login</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="appContainer" class="container" style="display: none;">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">📋 Tasks</div>
+            <div class="nav-buttons">
+                <button class="nav-btn active" id="navProjects" onclick="showSection('projects')">📁 Projects</button>
+                <button class="nav-btn" id="navTasks" onclick="showSection('tasks')">✅ Tasks</button>
+            </div>
+            <div id="userDisplay" style="margin-bottom:20px; font-size:12px; background:#34495e; padding:10px; border-radius:5px; text-align:center;"></div>
+            <button class="nav-btn logout-btn" onclick="handleLogout()">🚪 Logout</button>
+        </div>
+
+        <!-- Projects Section -->
+        <div class="main-content active" id="projectsSection">
+            <h2>Projects</h2>
+            <div class="user-info">Logged in as: <strong id="userEmail"></strong></div>
+
+            <div class="section" id="projectCreateSection">
+                <h3 style="margin-bottom:15px;">Create New Project</h3>
+                <div class="form-inline">
+                    <input type="text" id="projectName" placeholder="Project name">
+                    <input type="text" id="projectDescription" placeholder="Description (optional)">
+                    <button class="btn" onclick="createProject()">+ Create</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 style="margin-bottom:15px;">Projects List</h3>
+                <div id="projectsList" class="projects-grid"></div>
+                <div id="projectsEmpty" class="empty-state">No projects yet. Create one to get started!</div>
+            </div>
+        </div>
+
+        <!-- Tasks Section -->
+        <div class="main-content" id="tasksSection">
+            <h2>Tasks</h2>
+
+            <div class="section" id="taskCreateSection">
+                <h3 style="margin-bottom:15px;">Create New Task</h3>
+                <div class="form-inline">
+                    <input type="text" id="taskTitle" placeholder="Task title">
+                    <input type="text" id="taskDescription" placeholder="Description (optional)">
+                    <select id="taskProjectId">
+                        <option value="">Select Project</option>
+                    </select>
+                    <select id="taskPriority">
+                        <option value="low">Priority: Low</option>
+                        <option value="medium">Priority: Medium</option>
+                        <option value="high">Priority: High</option>
+                    </select>
+                    <input type="number" id="taskAssigneeId" placeholder="Assignee User ID (optional)">
+                    <button class="btn" onclick="createTask()">+ Create</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 style="margin-bottom:15px;">Tasks List</h3>
+
+                <div class="form-inline" style="margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                    <select id="filterStatus" onchange="applyFilters()">
+                        <option value="">All Statuses</option>
+                        <option value="todo">To Do</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="done">Done</option>
+                    </select>
+                    <select id="filterPriority" onchange="applyFilters()">
+                        <option value="">All Priorities</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                    <input type="number" id="filterAssignee" placeholder="Filter by Assignee ID" oninput="applyFilters()">
+                    <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                </div>
+
+                <div id="tasksList" class="tasks-list"></div>
+                <div id="tasksEmpty" class="empty-state">No tasks yet. Create one to get started!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Project Modal -->
+    <div id="editProjectModal" class="auth-panel" style="display: none;">
+        <div class="auth-container">
+            <div class="auth-box">
+                <h2>Edit Project</h2>
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" id="editProjectName" placeholder="Enter project name">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="editProjectDescription" placeholder="Enter description (optional)">
+                </div>
+                <button class="btn btn-full" onclick="saveProjectUpdate()">Save Changes</button>
+                <button class="btn btn-secondary btn-full" onclick="closeEditProjectModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Task Modal -->
+    <div id="editTaskModal" class="auth-panel" style="display: none;">
+        <div class="auth-container">
+            <div class="auth-box">
+                <h2>Edit Task</h2>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="editTaskTitle" placeholder="Enter task title">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="editTaskDescription" placeholder="Enter description (optional)">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="editTaskStatus">
+                        <option value="todo">To Do</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="done">Done</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="editTaskPriority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Assign to (User ID)</label>
+                    <input type="number" id="editTaskAssigneeId" placeholder="Enter user ID">
+                </div>
+                <button class="btn btn-full" onclick="saveTaskUpdate()">Save Changes</button>
+                <button class="btn btn-secondary btn-full" onclick="closeEditTaskModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let currentUser = null;
+        let allTasks = [];
+
+        // ── Auth Helper ──────────────────────────────
+        function authHeaders(extraHeaders = {}) {
+            const token = localStorage.getItem('token');
+            return {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                ...extraHeaders
+            };
+        }
+
+        // ── AUTH ─────────────────────────────────────
+        async function handleLogin() {
+            const email    = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showAuthAlert('Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `${API_BASE}/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
+                    { method: 'POST' }
+                );
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.access_token);
+
+                    let userRole = data.role;
+                    let userId   = data.user_id;
+
+                    if (!userRole || !userId) {
+                        try {
+                            const payload = JSON.parse(atob(data.access_token.split('.')[1]));
+                            userRole = userRole || payload.role || 'user';
+                            userId   = userId   || payload.user_id;
+                        } catch (e) {
+                            userRole = userRole || 'user';
+                        }
+                    }
+
+                    userId = Number(userId);
+
+                    // ✅ FIX: Build the user object once and store it
+                    const user = { email, role: userRole, id: userId };
+                    localStorage.setItem('user', JSON.stringify(user));
+
+                    showAuthAlert('Login successful!', 'success');
+                    // ✅ FIX: Pass user directly to initializeApp — no re-read from localStorage
+                    setTimeout(() => initializeApp(user), 500);
+                } else {
+                    showAuthAlert(data.detail || 'Login failed', 'error');
+                }
+            } catch (err) {
+                showAuthAlert('Error connecting to server', 'error');
+                console.error('Login error:', err);
+            }
+        }
+
+        async function handleRegister() {
+            const name     = document.getElementById('registerName').value.trim();
+            const email    = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const role     = document.getElementById('registerRole').value;
+
+            if (!name || !email || !password || !role) {
+                showAuthAlert('Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `${API_BASE}/register?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&role=${role}`,
+                    { method: 'POST' }
+                );
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAuthAlert('Registration successful! Please login.', 'success');
+                    setTimeout(toggleAuthForm, 800);
+                } else {
+                    showAuthAlert(data.detail || 'Registration failed', 'error');
+                }
+            } catch (err) {
+                showAuthAlert('Error connecting to server', 'error');
+                console.error('Register error:', err);
+            }
+        }
+
+        function toggleAuthForm() {
+            const login    = document.getElementById('loginForm');
+            const register = document.getElementById('registerForm');
+            const title    = document.getElementById('authTitle');
+            const isLogin  = login.style.display !== 'none';
+
+            login.style.display    = isLogin ? 'none'  : 'block';
+            register.style.display = isLogin ? 'block' : 'none';
+            title.textContent      = isLogin ? 'Register' : 'Login';
+            document.getElementById('authAlert').innerHTML = '';
+        }
+
+        function showAuthAlert(message, type) {
+            document.getElementById('authAlert').innerHTML =
+                `<div class="alert alert-${type}">${message}</div>`;
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            currentUser = null;
+
+            document.getElementById('authPanel').classList.add('active');
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('loginForm').style.display    = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('authTitle').textContent      = 'Login';
+            document.getElementById('authAlert').innerHTML        = '';
+            document.getElementById('loginEmail').value           = '';
+            document.getElementById('loginPassword').value        = '';
+        }
+
+        // ── APP INIT ──────────────────────────────────
+        // ✅ FIX: Accepts a user object directly so it never re-reads a stale localStorage value.
+        //         On page refresh it falls back to localStorage as before.
+        function initializeApp(user) {
+            // Use the passed-in user (fresh from login) or fall back to localStorage (page refresh)
+            if (!user) {
+                user = JSON.parse(localStorage.getItem('user'));
+            }
+            if (!user) return;
+
+            // ✅ FIX: Set currentUser FIRST before any role-dependent function runs
+            currentUser = user;
+
+            const role = currentUser.role || 'user';
+            document.getElementById('userEmail').textContent   = currentUser.email;
+            document.getElementById('userDisplay').textContent = `${role.toUpperCase()}\n${currentUser.email}`;
+            document.getElementById('authPanel').classList.remove('active');
+            document.getElementById('appContainer').style.display = 'flex';
+
+            // ✅ FIX: updateUIByRole no longer calls loadTasks() — single load below
+            updateUIByRole();
+            loadProjects();
+            loadTasks();
+        }
+
+        function updateUIByRole() {
+            const role = currentUser?.role || 'user';
+
+            // Projects nav button — hide for employees
+            const navProjects = document.getElementById('navProjects');
+            if (navProjects) {
+                navProjects.style.display = role === 'employee' ? 'none' : '';
+            }
+
+            // Task creation section — hide for employees
+            const taskCreateSection = document.getElementById('taskCreateSection');
+            if (taskCreateSection) {
+                taskCreateSection.style.display = role === 'employee' ? 'none' : '';
+            }
+
+            // Project creation section — hide for non-admins
+            const projectCreateSection = document.getElementById('projectCreateSection');
+            if (projectCreateSection) {
+                projectCreateSection.style.display = role !== 'admin' ? 'none' : '';
+            }
+
+            // If employee, jump straight to Tasks section
+            if (role === 'employee') {
+                document.getElementById('projectsSection').classList.remove('active');
+                document.getElementById('tasksSection').classList.add('active');
+                document.getElementById('navProjects').classList.remove('active');
+                document.getElementById('navTasks').classList.add('active');
+            }
+
+            // ✅ FIX: NO loadTasks() call here — removed the race condition
+        }
+
+        function showSection(section) {
+            document.getElementById('projectsSection').classList.remove('active');
+            document.getElementById('tasksSection').classList.remove('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+            if (section === 'projects') {
+                document.getElementById('projectsSection').classList.add('active');
+                document.getElementById('navProjects').classList.add('active');
+                loadProjects();
+            } else {
+                document.getElementById('tasksSection').classList.add('active');
+                document.getElementById('navTasks').classList.add('active');
+                loadTasks();
+            }
+        }
+
+        // ── PROJECTS ─────────────────────────────────
+        async function loadProjects() {
+            try {
+                const response = await fetch(`${API_BASE}/projects`, {
+                    method: 'GET',
+                    headers: authHeaders()
+                });
+
+                if (response.status === 401) { handleLogout(); return; }
+
+                const projects = await response.json();
+                renderProjects(projects);
+            } catch (err) {
+                console.error('Load projects error:', err);
+            }
+        }
+
+        function renderProjects(projects) {
+            const list    = document.getElementById('projectsList');
+            const empty   = document.getElementById('projectsEmpty');
+            const select  = document.getElementById('taskProjectId');
+            const role    = currentUser?.role || 'user';
+
+            if (projects.length === 0) {
+                empty.style.display = 'block';
+                list.innerHTML      = '';
+                select.innerHTML    = '<option value="">Select Project</option>';
+                return;
+            }
+
+            empty.style.display = 'none';
+            list.innerHTML = projects.map(p => {
+                const editDeleteButtons = role === 'admin' ? `
+                    <button class="btn btn-edit" onclick="openEditProjectModal(${p.id}, '${escHtml(p.name)}', '${escHtml(p.description || '')}')">✏️ Edit</button>
+                    <button class="btn btn-delete" onclick="deleteProject(${p.id})">🗑 Delete</button>
+                ` : '';
+
+                return `
+                    <div class="card">
+                        <h3>📁 ${escHtml(p.name)}</h3>
+                        <p>${escHtml(p.description || 'No description')}</p>
+                        <small style="color:#95a5a6;">Created: ${new Date(p.created_at).toLocaleDateString()}</small>
+                        <div class="card-actions">${editDeleteButtons}</div>
+                    </div>
+                `;
+            }).join('');
+
+            select.innerHTML = '<option value="">Select Project</option>' +
+                projects.map(p => `<option value="${p.id}">${escHtml(p.name)}</option>`).join('');
+        }
+
+        async function createProject() {
+            const name        = document.getElementById('projectName').value.trim();
+            const description = document.getElementById('projectDescription').value.trim();
+
+            if (!name) { alert('Please enter a project name'); return; }
+
+            try {
+                const response = await fetch(`${API_BASE}/projects`, {
+                    method:  'POST',
+                    headers: authHeaders(),
+                    body:    JSON.stringify({ name, description })
+                });
+
+                if (response.status === 401) { handleLogout(); return; }
+
+                if (response.ok) {
+                    document.getElementById('projectName').value        = '';
+                    document.getElementById('projectDescription').value = '';
+                    loadProjects();
+                } else {
+                    const err = await response.json();
+                    alert(err.detail || 'Failed to create project');
+                }
+            } catch (err) {
+                console.error('Create project error:', err);
+                alert('Error creating project');
+            }
+        }
+
+        async function deleteProject(projectId) {
+            if (!confirm('Delete this project? All its tasks will also be removed.')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/projects/${projectId}`, {
+                    method:  'DELETE',
+                    headers: authHeaders()
+                });
+
+                if (response.status === 401) { handleLogout(); return; }
+
+                if (response.ok) {
+                    loadProjects();
+                    loadTasks();
+                } else {
+                    alert('Failed to delete project');
+                }
+            } catch (err) {
+                console.error('Delete project error:', err);
+            }
+        }
+
+        // ── TASKS ─────────────────────────────────────
+        async function loadTasks() {
+            try {
+                const response = await fetch(`${API_BASE}/tasks`, {
+                    method: 'GET',
+                    headers: authHeaders()
+                });
+
+                if (response.status === 401) { handleLogout(); return; }
+
+                allTasks = await response.json();
+                applyFilters();
+            } catch (err) {
+                console.error('Load tasks error:', err);
+            }
+        }
+
+        function renderTasks(tasks) {
+            const list  = document.getElementById('tasksList');
+            const empty = document.getElementById('tasksEmpty');
+            const role  = String(currentUser?.role || '').toLowerCase();
+            const userId = Number(currentUser?.id);
+
+            if (tasks.length === 0) {
+                empty.style.display = 'block';
+                list.innerHTML      = '';
+                return;
+            }
+
+            empty.style.display = 'none';
+            list.innerHTML = tasks.map(task => {
+                const taskAssigneeId = Number(task.assignee_id);
+                const canDelete      = role === 'admin' || role === 'manager';
+
+                const employeeStatusSelect = role === 'employee' && taskAssigneeId === userId ? `
+                    <select class="status-select" onchange="changeTaskStatus(${task.id}, this.value)">
+                        <option value="todo"${task.status === 'todo' ? ' selected' : ''}>To Do</option>
+                        <option value="in_progress"${task.status === 'in_progress' ? ' selected' : ''}>In Progress</option>
+                        <option value="done"${task.status === 'done' ? ' selected' : ''}>Done</option>
+                    </select>
+                ` : '';
+
+                const managerButtons = canDelete ? `
+                    <button class="btn btn-edit" onclick="openEditTaskModal(${task.id}, '${escHtml(task.title)}', '${escHtml(task.description || '')}', '${task.status}', '${task.priority || 'medium'}', ${task.assignee_id !== null && task.assignee_id !== undefined ? task.assignee_id : "''"})">✏️ Edit</button>
+                    <button class="btn btn-delete" onclick="deleteTask(${task.id})">🗑 Delete</button>
+                ` : '';
+
+                const actionButtons  = role === 'employee' ? employeeStatusSelect : managerButtons;
+                const statusLabel    = task.status === 'todo' ? 'To Do' : task.status === 'in_progress' ? 'In Progress' : 'Done';
+                const statusClass    = task.status.replace('_', '-');
+
+                return `
+                    <div class="task-card ${task.status === 'done' ? 'completed' : ''}">
+                        <div class="task-info">
+                            <h3>${escHtml(task.title)}</h3>
+                            <p>${escHtml(task.description || 'No description')}</p>
+                            <small style="color:#95a5a6;">Priority: <strong>${task.priority || 'medium'}</strong></small>
+                            <br>
+                            <small style="color:#95a5a6;">Assigned to: <strong>${task.assignee_id ? 'User #' + task.assignee_id : 'Unassigned'}</strong></small>
+                            <span class="status-badge status-${statusClass}">${statusLabel}</span>
+                        </div>
+                        <div class="card-actions">${actionButtons}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ── TASK FILTERING ────────────────────────────
+        function applyFilters() {
+            const statusFilter   = document.getElementById('filterStatus').value;
+            const priorityFilter = document.getElementById('filterPriority').value;
+            const assigneeFilter = document.getElementById('filterAssignee').value.trim();
+            const role           = currentUser?.role || 'user';
+            const userId         = Number(currentUser?.id);
+
+            const filtered = allTasks.filter(task => {
+                if (role === 'employee' && Number(task.assignee_id) !== userId) return false;
+                if (statusFilter   && task.status   !== statusFilter)           return false;
+                if (priorityFilter && task.priority !== priorityFilter)         return false;
+                if (assigneeFilter && task.assignee_id !== Number(assigneeFilter)) return false;
+                return true;
+            });
+
+            renderTasks(filtered);
+        }
+
+        function clearFilters() {
+            document.getElementById('filterStatus').value   = '';
+            document.getElementById('filterPriority').value = '';
+            document.getElementById('filterAssignee').value = '';
+            applyFilters();
+        }
+
+        async function createTask() {
+            const title       = document.getElementById('taskTitle').value.trim();
+            const description = document.getElementById('taskDescription').value.trim();
+            const projectId   = document.getElementById('taskProjectId').value;
+            const priority    = document.getElementById('taskPriority').value || 'medium';
+            const assigneeId  = document.getElementById('taskAssigneeId').value.trim();
+
+            if (!title || !projectId) {
+                alert('Please enter a task title and select a project');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/tasks`, {
+                    method:  'POST',
+                    headers: authHeaders(),
+                    body:    JSON.stringify({
+                        title,
+                        description,
+                        project_id:  Number(projectId),
+                        priority,
+                        assignee_id: assigneeId ? Number(assigneeId) : null,
+                        status:      'todo'
+                    })
+                });
+
+                if (response.status === 401) { handleLogout(); return; }
+
+                if (response.ok) {
+                    document.getElementById('taskTitle').value       = '';
+                    document.getElementById('taskDescription').value = '';
+                    document.getElementById('taskProjectId').value   = '';
+                    document.getElementById('taskPriority').value    = 'medium';
+                    document.getElementById('taskAssigneeId').value  = '';
+                    loadTasks();
+                } else {
+                    const err = await response.json();
+                    alert(err.detail || 'Failed to create task');
+                }
+            } catch (err) {
+                console.error('Create task error:', err);
+                alert('Error creating task');
+            }
+        }
+
+        async function changeTaskStatus(taskId, status) {
+            try {
+                const response = await fetch(`${API_BASE}/tasks/${taskId}`, {
+                    method:  'PUT',
+                    headers: authHeaders(),
+                    body:    JSON.stringify({ status })
+                });
+
+                if (response.status === 401) { handleLogout(); return; }
+
+                if (response.ok) {
+                    loadTasks();
+                } else {
+                    const err = await response.json();
+                    alert(err.detail || 'Failed to change task status');
+                }
+            } catch (err) {
+                console.error('Change status error:', err);
+                alert('Error changing task status');
+            }
+        }
+
+        async function deleteTask(taskId) {
+            if (!confirm('Are you sure you want to delete this task?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/tasks/${taskId}`, {
+                    method:  'DELETE',
+                    headers: authHeaders()
+                });
+
+                if (response.status === 401) { handleLogout(); return; }
+
+                if (response.ok) {
+                    loadTasks();
+                } else {
+                    alert('Failed to delete task');
+                }
+            } catch (err) {
+                console.error('Delete task error:', err);
+            }
+        }
+
+        // ── EDIT PROJECT MODAL ────────────────────────
+        let currentEditProjectId = null;
+
+        function openEditProjectModal(projectId, name, description) {
+            currentEditProjectId = projectId;
+            document.getElementById('editProjectName').value        = name;
+            document.getElementById('editProjectDescription').value = description;
+            document.getElementById('editProjectModal').style.display = 'block';
+        }
+
+        function closeEditProjectModal() {
+            document.getElementById('editProjectModal').style.display = 'none';
+            currentEditProjectId = null;
+        }
+
+        async function saveProjectUpdate() {
+            const name        = document.getElementById('editProjectName').value.trim();
+            const description = document.getElementById('editProjectDescription').value.trim();
+
+            if (!name) { alert('Project name is required'); return; }
+
+            try {
+                const response = await fetch(`${API_BASE}/projects/${currentEditProjectId}`, {
+                    method:  'PUT',
+                    headers: authHeaders(),
+                    body:    JSON.stringify({ name, description })
+                });
+
+                if (response.status === 401) { handleLogout(); return; }
+
+                if (response.ok) {
+                    closeEditProjectModal();
+                    loadProjects();
+                } else {
+                    const err = await response.json();
+                    alert(err.detail || 'Failed to update project');
+                }
+            } catch (err) {
+                console.error('Update project error:', err);
+                alert('Error updating project');
+            }
+        }
+
+        // ── EDIT TASK MODAL ───────────────────────────
+        let currentEditTaskId = null;
+
+        function openEditTaskModal(taskId, title, description, status, priority, assigneeId) {
+            currentEditTaskId = taskId;
+            document.getElementById('editTaskTitle').value       = title;
+            document.getElementById('editTaskDescription').value = description;
+            document.getElementById('editTaskStatus').value      = status;
+            document.getElementById('editTaskPriority').value    = priority;
+            document.getElementById('editTaskAssigneeId').value  = assigneeId || '';
+            document.getElementById('editTaskModal').style.display = 'block';
+        }
+
+        function closeEditTaskModal() {
+            document.getElementById('editTaskModal').style.display = 'none';
+            currentEditTaskId = null;
+        }
+
+        async function saveTaskUpdate() {
+            const title       = document.getElementById('editTaskTitle').value.trim();
+            const description = document.getElementById('editTaskDescription').value.trim();
+            const status      = document.getElementById('editTaskStatus').value;
+            const priority    = document.getElementById('editTaskPriority').value;
+            const assigneeId  = document.getElementById('editTaskAssigneeId').value.trim();
+
+            if (!title) { alert('Task title is required'); return; }
+
+            try {
+                const response = await fetch(`${API_BASE}/tasks/${currentEditTaskId}`, {
+                    method:  'PUT',
+                    headers: authHeaders(),
+                    body:    JSON.stringify({
+                        title,
+                        description,
+                        status,
+                        priority,
+                        assignee_id: assigneeId ? Number(assigneeId) : null
+                    })
+                });
+
+                if (response.status === 401) { handleLogout(); return; }
+
+                if (response.ok) {
+                    closeEditTaskModal();
+                    loadTasks();
+                } else {
+                    const err = await response.json();
+                    alert(err.detail || 'Failed to update task');
+                }
+            } catch (err) {
+                console.error('Update task error:', err);
+                alert('Error updating task');
+            }
+        }
+
+        // ── HELPERS ───────────────────────────────────
+        function escHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // ── BOOT ──────────────────────────────────────
+        // On page load/refresh, restore session from localStorage
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const user  = localStorage.getItem('user');
+            if (token && user) {
+                initializeApp(JSON.parse(user));
+            }
+        });
+    </script>
+</body>
+</html>

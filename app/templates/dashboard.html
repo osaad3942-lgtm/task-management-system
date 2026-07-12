@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monitoring Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #222;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .card p {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0 0;
+        }
+
+        .healthy {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+
+        table {
+            margin-top: 30px;
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #222;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Task Management System - Monitoring Dashboard</h1>
+
+    <div class="cards">
+        <div class="card">
+            <h2>System Health</h2>
+            <p class="healthy">{{ metrics.system_health }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Uptime Seconds</h2>
+            <p>{{ metrics.uptime_seconds }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Total Requests</h2>
+            <p>{{ metrics.total_requests }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Successful Requests</h2>
+            <p>{{ metrics.successful_requests }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Error Requests</h2>
+            <p class="error">{{ metrics.error_requests }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Average Response Time</h2>
+            <p>{{ metrics.average_response_time_seconds }}s</p>
+        </div>
+    </div>
+
+    <h2>Recent Errors</h2>
+
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Path</th>
+            <th>Status Code</th>
+            <th>Response Time</th>
+        </tr>
+
+        {% for error in metrics.recent_errors %}
+        <tr>
+            <td>{{ error.method }}</td>
+            <td>{{ error.path }}</td>
+            <td>{{ error.status_code }}</td>
+            <td>{{ error.response_time }}s</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</body>
+</html>
