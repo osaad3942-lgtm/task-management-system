@@ -95,22 +95,3 @@ GO
 
 
 
-INSERT INTO users (name, email, password, role)
-VALUES 
-('Admin User', 'admin@test.com', '1234', 'admin'),
-('Manager User', 'manager@test.com', '1234', 'manager'),
-('Employee User', 'emp@test.com', '1234', 'employee');
-
-INSERT INTO projects (name, description, created_by)
-VALUES 
-('AI Project', 'Task Management System', 1);
-
-INSERT INTO tasks (title, description, status, priority, user_id, project_id)
-VALUES
-('Design DB', 'Create database schema', 'todo', 'high', 3, 1);
-GO
-
-
-
-DELETE FROM users
-WHERE id >= 16;
