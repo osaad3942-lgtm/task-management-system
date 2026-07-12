@@ -122,9 +122,6 @@ task-management-system/
 ├── logs/
 │   └── app.log                  # Application log output
 ├── requirements.txt
-├── Dockerfile
-├── docker-compose.yml
-└── .env
 ```
 
 ---
@@ -301,8 +298,6 @@ name=John Doe&email=john@example.com&password=secret&role=employee
 - Python 3.11+
 - Microsoft SQL Server (with `ODBC Driver 17 for SQL Server`)
 - Redis 6+
-- Docker & Docker Compose (for containerized setup)
-
 ---
 
 ### Local Setup
@@ -354,22 +349,6 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ---
-
-### Docker Setup
-
-```bash
-docker-compose up --build
-```
-
-This starts three services:
-- `api` — FastAPI app on port `8000`
-- `redis` — Redis on port `6379`
-- `db` — SQL Server on port `1433`
-
-> See [Environment Variables](#environment-variables) for required `.env` values before running Docker.
-
----
-
 ## Environment Variables
 
 Create a `.env` file in the project root with the following values:
