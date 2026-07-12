@@ -17,7 +17,6 @@ A production-ready RESTful API built with **FastAPI**, **SQL Server**, and **Red
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Local Setup](#local-setup)
-  - [Docker Setup](#docker-setup)
 - [Environment Variables](#environment-variables)
 - [Running Tests](#running-tests)
 - [Monitoring](#monitoring)
